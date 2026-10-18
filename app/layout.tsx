@@ -1,4 +1,3 @@
-import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono, Roboto } from 'next/font/google';
 import './globals.css';
@@ -6,6 +5,9 @@ import { cn } from '@/lib/utils';
 import { Footer, Navbar } from '@/components/navigation';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { Auth0Provider } from '@auth0/nextjs-auth0';
+import { Suspense } from 'react';
+import { NavbarLoader } from '@/components/loaders';
 
 const roboto = Roboto({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -34,7 +36,6 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html
       lang='nl'
       className={cn(
-        'h-full',
         'antialiased',
         geistSans.variable,
         geistMono.variable,
@@ -42,18 +43,20 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         roboto.variable,
       )}
       suppressHydrationWarning>
-      <body className='min-h-full flex flex-col antialiased'>
-        {/* <ClerkProvider> */}
-        <TooltipProvider>
-          <SidebarProvider defaultOpen={false}>
-            <main className='flex-1 overflow-y-auto'>
-              <Navbar />
-              {children}
-            </main>
-          </SidebarProvider>
+      <body className='min-h-screen flex flex-col antialiased'>
+        <Auth0Provider>
+          <TooltipProvider>
+            <SidebarProvider defaultOpen={false}>
+              <main className='w-full grow'>
+                <Suspense fallback={<NavbarLoader />}>
+                  <Navbar />
+                </Suspense>
+                {children}
+              </main>
+            </SidebarProvider>
+          </TooltipProvider>
           <Footer />
-        </TooltipProvider>
-        {/* </ClerkProvider> */}
+        </Auth0Provider>
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 export type Link = {
   name: string;
   href: string;
+  isProtected?: boolean;
   subLinks?: Link[];
 };
 
